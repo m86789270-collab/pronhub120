@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Photo Preview</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #000;
+}
+
+.page {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    cursor: pointer;
+    background: #000;
+}
+
+/* Mobile: 2 columns × 5 rows */
+.image-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+    gap: 2px;
+    background: #111;
+}
+
+.image-box {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: #111;
+}
+
+.image-box img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: blur(2.5px);
+    transform: scale(1.04);
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.image-box::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.10);
+    pointer-events: none;
+}
+
+/* Play icon */
+.play-icon {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.58);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+}
+
+.play-icon::before {
+    content: "";
+    width: 0;
+    height: 0;
+    margin-left: 3px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-left: 11px solid #fff;
+}
+
+/* Hide the two icons beside the center button */
+.image-box:nth-child(5) .play-icon,
+.image-box:nth-child(6) .play-icon {
+    display: none;
+}
+
+/* Center payment option */
+.payment-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* Light blurred panel around the button */
+.payment-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 17px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 18px;
+    background: rgba(15, 18, 25, 0.28);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.25);
+    pointer-events: auto;
+}
+
+/* Smaller highlighted button */
+.payment-btn {
+    min-height: 50px;
+    padding: 12px 22px;
+    border: 1.5px solid #fff5cc;
+    border-radius: 13px;
+    background: linear-gradient(
+        135deg,
+        #fff176 0%,
+        #ffc107 55%,
+        #ff9800 100%
+    );
+    color: #172033;
+    font-family: inherit;
+    font-size: clamp(18px, 4.5vw, 22px);
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    box-shadow:
+        0 0 0 3px rgba(255, 193, 7, 0.15),
+        0 4px 14px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.payment-btn:hover {
+    filter: brightness(1.08);
+}
+
+.payment-btn:active {
+    transform: scale(0.96);
+}
+
+/* Landscape: 5 columns × 2 rows */
+@media (orientation: landscape) and (min-width: 700px) {
+    .image-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-rows: repeat(2, minmax(0, 1fr));
+    }
+
+    .play-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* Keep exactly two icons hidden nearest the center button */
+    .image-box:nth-child(5) .play-icon,
+    .image-box:nth-child(6) .play-icon {
+        display: flex;
+    }
+
+    .image-box:nth-child(3) .play-icon,
+    .image-box:nth-child(8) .play-icon {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main class="page" id="page">
+
+    <div class="image-grid">
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375811/1790492939855-66478.jpg" alt="Preview 1">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375810/1790492941549-66477.jpg" alt="Preview 2">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375810/1790492942463-66480.jpg" alt="Preview 3">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375811/1790492943556-66481.jpg" alt="Preview 4">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375809/2560x1440.226.webp" alt="Preview 5">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375809/images-2.jpg" alt="Preview 6">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375808/images-1.jpg" alt="Preview 7">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375809/photo-1574539602047-548bf9557352.jpg" alt="Preview 8">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375811/1790492939855-66478.jpg" alt="Preview 9">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+        <div class="image-box">
+            <img src="https://res.cloudinary.com/yftsiera/image/upload/v1792375809/images-2.jpg" alt="Preview 10">
+            <span class="play-icon" aria-hidden="true"></span>
+        </div>
+
+    </div>
+
+    <div class="payment-overlay">
+        <div class="payment-panel">
+            <button class="payment-btn" type="button">
+                Pay $1 to View
+            </button>
+        </div>
+    </div>
+
+</main>
+
+<script>
+document.getElementById("page").addEventListener("click", function () {
+    window.location.href = "information.html";
+});
+</script>
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC3e6Q2jbht4cslONzbU9BwzD1p3KVZivA",
+    authDomain: "new-projuct-1.firebaseapp.com",
+    projectId: "new-projuct-1",
+    storageBucket: "new-projuct-1.firebasestorage.app",
+    messagingSenderId: "5903682841",
+    appId: "1:5903682841:web:3bdfce8bda9422649d0988",
+    measurementId: "G-45DWE3DJEW"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function trackVisitor() {
+
+    try {
+
+        const now = new Date();
+
+        await addDoc(collection(db, "visitors"), {
+
+            pageId: "page2",
+
+            date: [
+                now.getFullYear(),
+                String(now.getMonth() + 1).padStart(2, "0"),
+                String(now.getDate()).padStart(2, "0")
+            ].join("-"),
+
+            createdAt: serverTimestamp(),
+
+            source: "Pronhub120"
+
+        });
+
+        console.log("Page 2 visit recorded");
+
+    } catch (error) {
+
+        console.error("Visitor tracking error:", error);
+
+    }
+
+}
+
+trackVisitor();
+
+</script>
+</body>
+</html>

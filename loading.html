@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Loading</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100dvh;
+    background: #f8faff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-container {
+    text-align: center;
+    padding: 25px;
+}
+
+.spinner {
+    width: 65px;
+    height: 65px;
+    border: 5px solid #e0e7ff;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    margin: 0 auto 30px;
+    animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+h2 {
+    color: #111827;
+    font-size: 23px;
+    margin-bottom: 12px;
+}
+
+p {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.demo-label {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 9px 17px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.back-btn {
+    display: block;
+    margin: 30px auto 0;
+    padding: 12px 24px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: white;
+    color: #374151;
+    font-size: 14px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="loading-container">
+
+    <div class="spinner"></div>
+
+    <h2>Demo Loading</h2>
+
+    
+
+  
+
+    <button
+        class="back-btn"
+        onclick="window.location.href='index.html'"
+    >
+        Back to Home
+    </button>
+
+</div>
+<script>
+
+// Get submission count
+const submitCount = Number(
+    sessionStorage.getItem("submitCount") || "0"
+);
+
+// First submission
+if (submitCount === 1) {
+
+    // Wait 5 seconds
+    setTimeout(() => {
+
+        // Return to information page
+        window.location.replace("information.html");
+
+    }, 5000);
+
+}
+
+// Second submission
+else if (submitCount >= 2) {
+
+    // Stay on loading page
+    // Spinner continues running
+    // No redirect
+
+}
+
+          </script>
+</body>
+</html>
